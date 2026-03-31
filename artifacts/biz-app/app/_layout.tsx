@@ -50,6 +50,10 @@ function RootLayoutNav() {
       <Stack.Screen name="suppliers/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="payments/new" options={{ presentation: "modal", headerShown: false }} />
       <Stack.Screen name="reports/stock" options={{ headerShown: false }} />
+      <Stack.Screen name="reports/detail" options={{ headerShown: false }} />
+      <Stack.Screen name="reports/suppliers" options={{ headerShown: false }} />
+      <Stack.Screen name="reports/customers" options={{ headerShown: false }} />
+      <Stack.Screen name="returns/new" options={{ presentation: "modal", headerShown: false }} />
     </Stack>
   );
 }

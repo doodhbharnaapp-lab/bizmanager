@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, View, Text, StyleSheet, RefreshControl, Platform, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, StyleSheet, RefreshControl, Platform, TouchableOpacity, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -21,39 +21,77 @@ export default function ProductsScreen() {
   const { token } = useAuth();
   const { lowStock } = useLocalSearchParams();
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const { data: products = [], isLoading, refetch } = useQuery({
-    queryKey: ["products", lowStock],
+    queryKey: ["products"],
     queryFn: async () => {
-      const url = lowStock === "true" ? `${API_BASE}/products?lowStock=true` : `${API_BASE}/products`;
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE}/products`, { headers: { Authorization: `Bearer ${token}` } });
       return res.json();
     },
     enabled: !!token,
   });
 
-  const filtered = products.filter((p: any) =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    (p.category || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const allProducts = lowStock === "true"
+    ? products.filter((p: any) => p.stockQty <= (p.lowStockThreshold || 10))
+    : products;
+
+  const categories = Array.from(new Set(products.map((p: any) => p.category).filter(Boolean))) as string[];
+
+  const filtered = allProducts.filter((p: any) => {
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
+      (p.category || "").toLowerCase().includes(search.toLowerCase());
+    const matchCategory = !selectedCategory || p.category === selectedCategory;
+    return matchSearch && matchCategory;
+  });
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <AppHeader title="Products" subtitle={`${products.length} items`}
-        rightComponent={
-          <TouchableOpacity onPress={() => router.push("/products/categories" as any)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Feather name="filter" size={20} color="#FFF" />
-          </TouchableOpacity>
-        }
+      <AppHeader
+        title={lowStock === "true" ? "Low Stock" : "Products"}
+        subtitle={`${filtered.length} of ${products.length} items`}
       />
       <ScrollView
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 80 }]}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
       >
         <SearchBar value={search} onChangeText={setSearch} placeholder="Search products..." />
+
+        {categories.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.catRow}
+          >
+            <TouchableOpacity
+              style={[styles.catChip, { backgroundColor: !selectedCategory ? colors.primary : colors.muted, borderColor: !selectedCategory ? colors.primary : colors.border }]}
+              onPress={() => setSelectedCategory(null)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.catChipText, { color: !selectedCategory ? colors.primaryForeground : colors.mutedForeground }]}>All</Text>
+            </TouchableOpacity>
+            {categories.map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                style={[styles.catChip, { backgroundColor: selectedCategory === cat ? colors.primary : colors.muted, borderColor: selectedCategory === cat ? colors.primary : colors.border }]}
+                onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.catChipText, { color: selectedCategory === cat ? colors.primaryForeground : colors.mutedForeground }]}>{cat}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+
         {filtered.length === 0 ? (
-          <EmptyState icon="package" title="No products found" description="Add your first product to get started" actionLabel="Add Product" onAction={() => router.push("/products/new")} />
+          <EmptyState
+            icon="package"
+            title="No products found"
+            description="Add your first product to get started"
+            actionLabel="Add Product"
+            onAction={() => router.push("/products/new")}
+          />
         ) : (
           filtered.map((p: any) => (
             <ListItem
@@ -78,4 +116,7 @@ export default function ProductsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16 },
+  catRow: { flexDirection: "row", gap: 8, paddingBottom: 12 },
+  catChip: { borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, borderWidth: 1 },
+  catChipText: { fontSize: 13, fontFamily: "Inter_500Medium" },
 });

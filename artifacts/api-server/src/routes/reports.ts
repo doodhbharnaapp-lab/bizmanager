@@ -40,7 +40,7 @@ router.get("/profit-loss", async (req, res) => {
       }));
     }
 
-    res.json({ totalRevenue, totalCost, grossProfit, profitMargin, items });
+    res.json({ totalRevenue, totalCost, grossProfit, profitMargin, items, totalSalesCount: sales.length, totalPurchasesCount: purchases.length });
   } catch (err) {
     req.log.error(err);
     res.status(500).json({ error: "Internal server error" });
