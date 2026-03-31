@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "wyVyGlbqqO0EnEbypoFg-"
+uri = "file://artifacts/biz-app/assets/images/icon.png"
+type = "image"
+title = "bizmanager app icon"
+
+[[generated]]
+id = "RgIt-qSu7Zk0IDIprkR3T"
+uri = "file://artifacts/biz-app/assets/images/splash-icon.png"
+type = "image"
+title = "bizmanager splash icon"

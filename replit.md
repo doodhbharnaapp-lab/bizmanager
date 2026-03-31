@@ -91,6 +91,62 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
 
+### `artifacts/biz-app` (`@workspace/biz-app`)
+
+Expo React Native app — BizManager: Purchase & Sales Management. A full-featured Android business management app.
+
+**Features:**
+- JWT-based authentication (login + register)
+- Dashboard with KPIs (today's sales/purchases, monthly totals, outstanding balances, low stock alerts)
+- Products management with stock tracking, rack/location, GST percent, low stock alerts, manual stock adjustment
+- Sales entry with multi-item cart, GST invoice toggle, payment mode (cash/UPI/credit/bank), customer selection
+- Purchases entry with multi-item cart, supplier selection, GST per item, payment mode
+- Customer & Supplier ledgers with outstanding balance tracking
+- Payment recording for customers (collect) and suppliers (pay)
+- Reports: Profit & Loss, Stock Report, Top Products
+- 6-tab navigation: Dashboard, Products, Sales, Purchases, Parties, Reports
+
+**Design:** Navy blue (#0F4C81) primary, sky blue (#0EA5E9) accent, Inter font, dark mode support.
+
+**Screens:**
+- `app/login.tsx` — Login/Register screen
+- `app/(tabs)/index.tsx` — Dashboard
+- `app/(tabs)/products.tsx` — Product list
+- `app/(tabs)/sales.tsx` — Sales list
+- `app/(tabs)/purchases.tsx` — Purchases list
+- `app/(tabs)/parties.tsx` — Customers + Suppliers tabs
+- `app/(tabs)/reports.tsx` — Reports overview
+- `app/products/[id].tsx`, `app/products/new.tsx` — Product detail + form
+- `app/sales/[id].tsx`, `app/sales/new.tsx` — Sale detail + cart form
+- `app/purchases/[id].tsx`, `app/purchases/new.tsx` — Purchase detail + cart form
+- `app/customers/[id].tsx`, `app/customers/new.tsx` — Customer detail + form
+- `app/suppliers/[id].tsx`, `app/suppliers/new.tsx` — Supplier detail + form
+- `app/payments/new.tsx` — Payment recording
+- `app/reports/stock.tsx` — Stock report
+
+**Key files:**
+- `context/AuthContext.tsx` — JWT auth state (AsyncStorage persistence)
+- `constants/colors.ts` — Design tokens (light/dark)
+- `hooks/useColors.ts` — Color scheme hook
+- `components/` — AppHeader, SummaryCard, ListItem, SearchBar, FormField, SelectField, Badge, EmptyState, FAB
+
+**API base:** `https://$EXPO_PUBLIC_DOMAIN/api`
+
+### `artifacts/api-server` routes
+
+All routes registered under `/api`:
+- `/auth` — login, register, me
+- `/suppliers` — CRUD + ledger
+- `/customers` — CRUD + ledger
+- `/products` — CRUD + stock adjust
+- `/purchases` — CRUD with items + stock update
+- `/sales` — CRUD with items + stock update
+- `/payments` — record payments
+- `/returns` — purchase/sale returns
+- `/ledger` — ledger entries
+- `/dashboard` — summary, trends
+- `/reports` — profit-loss, stock, top-products
+
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.

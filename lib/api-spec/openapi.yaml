@@ -1,22 +1,43 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: BizManager Purchase & Sales Management API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: suppliers
+    description: Supplier management
+  - name: customers
+    description: Customer management
+  - name: products
+    description: Product management
+  - name: purchases
+    description: Purchase management
+  - name: sales
+    description: Sales management
+  - name: payments
+    description: Payment management
+  - name: returns
+    description: Return management
+  - name: ledger
+    description: Ledger entries
+  - name: reports
+    description: Reports & analytics
+  - name: dashboard
+    description: Dashboard summary
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,7 +45,831 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "200":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /suppliers:
+    get:
+      operationId: getSuppliers
+      tags: [suppliers]
+      summary: List suppliers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Supplier"
+    post:
+      operationId: createSupplier
+      tags: [suppliers]
+      summary: Create supplier
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplierRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+
+  /suppliers/{id}:
+    get:
+      operationId: getSupplier
+      tags: [suppliers]
+      summary: Get supplier
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+    put:
+      operationId: updateSupplier
+      tags: [suppliers]
+      summary: Update supplier
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplierRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+    delete:
+      operationId: deleteSupplier
+      tags: [suppliers]
+      summary: Delete supplier
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /suppliers/{id}/ledger:
+    get:
+      operationId: getSupplierLedger
+      tags: [suppliers]
+      summary: Get supplier ledger
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ledger entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerResponse"
+
+  /customers:
+    get:
+      operationId: getCustomers
+      tags: [customers]
+      summary: List customers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      summary: Create customer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      summary: Get customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Customer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    put:
+      operationId: updateCustomer
+      tags: [customers]
+      summary: Update customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      summary: Delete customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /customers/{id}/ledger:
+    get:
+      operationId: getCustomerLedger
+      tags: [customers]
+      summary: Get customer ledger
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ledger entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerResponse"
+
+  /products:
+    get:
+      operationId: getProducts
+      tags: [products]
+      summary: List products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: lowStock
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create product
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get product
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    put:
+      operationId: updateProduct
+      tags: [products]
+      summary: Update product
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      operationId: deleteProduct
+      tags: [products]
+      summary: Delete product
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /products/{id}/adjust:
+    post:
+      operationId: adjustStock
+      tags: [products]
+      summary: Adjust product stock
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockAdjustRequest"
+      responses:
+        "200":
+          description: Stock adjusted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /purchases:
+    get:
+      operationId: getPurchases
+      tags: [purchases]
+      summary: List purchases
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supplierId
+          in: query
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of purchases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Purchase"
+    post:
+      operationId: createPurchase
+      tags: [purchases]
+      summary: Create purchase
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePurchaseRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Purchase"
+
+  /purchases/{id}:
+    get:
+      operationId: getPurchase
+      tags: [purchases]
+      summary: Get purchase
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Purchase
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Purchase"
+
+  /sales:
+    get:
+      operationId: getSales
+      tags: [sales]
+      summary: List sales
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+        - name: paymentMode
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of sales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sale"
+    post:
+      operationId: createSale
+      tags: [sales]
+      summary: Create sale
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSaleRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sale"
+
+  /sales/{id}:
+    get:
+      operationId: getSale
+      tags: [sales]
+      summary: Get sale
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sale
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sale"
+
+  /payments:
+    get:
+      operationId: getPayments
+      tags: [payments]
+      summary: List payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: partyType
+          in: query
+          schema:
+            type: string
+        - name: partyId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      operationId: createPayment
+      tags: [payments]
+      summary: Record payment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /returns:
+    get:
+      operationId: getReturns
+      tags: [returns]
+      summary: List returns
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of returns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Return"
+    post:
+      operationId: createReturn
+      tags: [returns]
+      summary: Create return
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReturnRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Return"
+
+  /ledger:
+    get:
+      operationId: getLedgerEntries
+      tags: [ledger]
+      summary: Get ledger entries
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: partyType
+          in: query
+          schema:
+            type: string
+        - name: partyId
+          in: query
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ledger entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerResponse"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/trends:
+    get:
+      operationId: getDashboardTrends
+      tags: [dashboard]
+      summary: Get sales/purchase trends
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [daily, monthly, yearly]
+      responses:
+        "200":
+          description: Trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendPoint"
+
+  /reports/profit-loss:
+    get:
+      operationId: getProfitLossReport
+      tags: [reports]
+      summary: Get profit and loss report
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+        - name: groupBy
+          in: query
+          schema:
+            type: string
+            enum: [overall, product, rack]
+      responses:
+        "200":
+          description: P&L report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfitLossReport"
+
+  /reports/stock:
+    get:
+      operationId: getStockReport
+      tags: [reports]
+      summary: Get stock report
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Stock report
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StockReportItem"
+
+  /reports/top-products:
+    get:
+      operationId: getTopProducts
+      tags: [reports]
+      summary: Get top selling products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Top products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopProduct"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +879,767 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, staff]
+      required:
+        - name
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - user
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - role
+        - createdAt
+
+    Supplier:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        gstNumber:
+          type: string
+        balance:
+          type: number
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - balance
+        - createdAt
+
+    CreateSupplierRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        gstNumber:
+          type: string
+      required:
+        - name
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        gstNumber:
+          type: string
+        balance:
+          type: number
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - balance
+        - createdAt
+
+    CreateCustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        gstNumber:
+          type: string
+      required:
+        - name
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        purchasePrice:
+          type: number
+        sellingPrice:
+          type: number
+        gstPercent:
+          type: number
+        rack:
+          type: string
+        stockQty:
+          type: number
+        lowStockThreshold:
+          type: number
+        unit:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - purchasePrice
+        - sellingPrice
+        - gstPercent
+        - stockQty
+        - createdAt
+
+    CreateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        purchasePrice:
+          type: number
+        sellingPrice:
+          type: number
+        gstPercent:
+          type: number
+        rack:
+          type: string
+        stockQty:
+          type: number
+        lowStockThreshold:
+          type: number
+        unit:
+          type: string
+      required:
+        - name
+        - purchasePrice
+        - sellingPrice
+        - gstPercent
+
+    StockAdjustRequest:
+      type: object
+      properties:
+        adjustment:
+          type: number
+        reason:
+          type: string
+      required:
+        - adjustment
+
+    PurchaseItem:
+      type: object
+      properties:
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: number
+        purchasePrice:
+          type: number
+        gstPercent:
+          type: number
+        gstAmount:
+          type: number
+        totalAmount:
+          type: number
+      required:
+        - productId
+        - productName
+        - quantity
+        - purchasePrice
+        - gstPercent
+        - gstAmount
+        - totalAmount
+
+    Purchase:
+      type: object
+      properties:
+        id:
+          type: integer
+        invoiceNumber:
+          type: string
+        supplierId:
+          type: integer
+        supplierName:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PurchaseItem"
+        subtotal:
+          type: number
+        totalGst:
+          type: number
+        grandTotal:
+          type: number
+        paymentMode:
+          type: string
+        notes:
+          type: string
+        date:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - invoiceNumber
+        - supplierId
+        - supplierName
+        - items
+        - subtotal
+        - totalGst
+        - grandTotal
+        - paymentMode
+        - date
+        - createdAt
+
+    CreatePurchaseRequest:
+      type: object
+      properties:
+        supplierId:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: integer
+              quantity:
+                type: number
+              purchasePrice:
+                type: number
+              gstPercent:
+                type: number
+            required:
+              - productId
+              - quantity
+              - purchasePrice
+              - gstPercent
+        paymentMode:
+          type: string
+          enum: [cash, credit, upi, bank]
+        notes:
+          type: string
+        date:
+          type: string
+      required:
+        - supplierId
+        - items
+        - paymentMode
+
+    SaleItem:
+      type: object
+      properties:
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: number
+        sellingPrice:
+          type: number
+        gstPercent:
+          type: number
+        gstAmount:
+          type: number
+        totalAmount:
+          type: number
+      required:
+        - productId
+        - productName
+        - quantity
+        - sellingPrice
+        - gstPercent
+        - gstAmount
+        - totalAmount
+
+    Sale:
+      type: object
+      properties:
+        id:
+          type: integer
+        invoiceNumber:
+          type: string
+        customerId:
+          type: integer
+        customerName:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SaleItem"
+        subtotal:
+          type: number
+        totalGst:
+          type: number
+        grandTotal:
+          type: number
+        paymentMode:
+          type: string
+        isGstInvoice:
+          type: boolean
+        notes:
+          type: string
+        date:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - invoiceNumber
+        - items
+        - subtotal
+        - totalGst
+        - grandTotal
+        - paymentMode
+        - isGstInvoice
+        - date
+        - createdAt
+
+    CreateSaleRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: integer
+              quantity:
+                type: number
+              sellingPrice:
+                type: number
+              gstPercent:
+                type: number
+            required:
+              - productId
+              - quantity
+              - sellingPrice
+              - gstPercent
+        paymentMode:
+          type: string
+          enum: [cash, credit, upi, bank]
+        isGstInvoice:
+          type: boolean
+        notes:
+          type: string
+        date:
+          type: string
+      required:
+        - items
+        - paymentMode
+        - isGstInvoice
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        partyType:
+          type: string
+        partyId:
+          type: integer
+        partyName:
+          type: string
+        amount:
+          type: number
+        paymentMode:
+          type: string
+        notes:
+          type: string
+        date:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - partyType
+        - partyId
+        - partyName
+        - amount
+        - paymentMode
+        - date
+        - createdAt
+
+    CreatePaymentRequest:
+      type: object
+      properties:
+        partyType:
+          type: string
+          enum: [supplier, customer]
+        partyId:
+          type: integer
+        amount:
+          type: number
+        paymentMode:
+          type: string
+          enum: [cash, upi, bank, cheque]
+        notes:
+          type: string
+        date:
+          type: string
+      required:
+        - partyType
+        - partyId
+        - amount
+        - paymentMode
+
+    Return:
+      type: object
+      properties:
+        id:
+          type: integer
+        returnType:
+          type: string
+        referenceId:
+          type: integer
+        productId:
+          type: integer
+        productName:
+          type: string
+        quantity:
+          type: number
+        amount:
+          type: number
+        refundMode:
+          type: string
+        reason:
+          type: string
+        date:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - returnType
+        - referenceId
+        - productId
+        - productName
+        - quantity
+        - amount
+        - date
+        - createdAt
+
+    CreateReturnRequest:
+      type: object
+      properties:
+        returnType:
+          type: string
+          enum: [purchase_return, sale_return]
+        referenceId:
+          type: integer
+        productId:
+          type: integer
+        quantity:
+          type: number
+        amount:
+          type: number
+        refundMode:
+          type: string
+          enum: [cash, upi, credit, none]
+        reason:
+          type: string
+        date:
+          type: string
+      required:
+        - returnType
+        - referenceId
+        - productId
+        - quantity
+        - amount
+        - refundMode
+
+    LedgerEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        partyType:
+          type: string
+        partyId:
+          type: integer
+        type:
+          type: string
+        description:
+          type: string
+        debit:
+          type: number
+        credit:
+          type: number
+        balance:
+          type: number
+        referenceId:
+          type: integer
+        referenceType:
+          type: string
+        date:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - partyType
+        - partyId
+        - type
+        - description
+        - debit
+        - credit
+        - balance
+        - date
+        - createdAt
+
+    LedgerResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LedgerEntry"
+        openingBalance:
+          type: number
+        closingBalance:
+          type: number
+        totalDebit:
+          type: number
+        totalCredit:
+          type: number
+      required:
+        - entries
+        - openingBalance
+        - closingBalance
+        - totalDebit
+        - totalCredit
+
+    DashboardSummary:
+      type: object
+      properties:
+        todaySales:
+          type: number
+        todayPurchases:
+          type: number
+        totalSalesThisMonth:
+          type: number
+        totalPurchasesThisMonth:
+          type: number
+        grossProfit:
+          type: number
+        pendingFromCustomers:
+          type: number
+        pendingToSuppliers:
+          type: number
+        lowStockCount:
+          type: integer
+        totalProducts:
+          type: integer
+        totalCustomers:
+          type: integer
+        totalSuppliers:
+          type: integer
+      required:
+        - todaySales
+        - todayPurchases
+        - totalSalesThisMonth
+        - totalPurchasesThisMonth
+        - grossProfit
+        - pendingFromCustomers
+        - pendingToSuppliers
+        - lowStockCount
+        - totalProducts
+        - totalCustomers
+        - totalSuppliers
+
+    TrendPoint:
+      type: object
+      properties:
+        label:
+          type: string
+        sales:
+          type: number
+        purchases:
+          type: number
+        profit:
+          type: number
+      required:
+        - label
+        - sales
+        - purchases
+        - profit
+
+    ProfitLossReport:
+      type: object
+      properties:
+        totalRevenue:
+          type: number
+        totalCost:
+          type: number
+        grossProfit:
+          type: number
+        profitMargin:
+          type: number
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              revenue:
+                type: number
+              cost:
+                type: number
+              profit:
+                type: number
+              margin:
+                type: number
+            required:
+              - label
+              - revenue
+              - cost
+              - profit
+              - margin
+      required:
+        - totalRevenue
+        - totalCost
+        - grossProfit
+        - profitMargin
+        - items
+
+    StockReportItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        rack:
+          type: string
+        stockQty:
+          type: number
+        lowStockThreshold:
+          type: number
+        purchasePrice:
+          type: number
+        sellingPrice:
+          type: number
+        stockValue:
+          type: number
+        isLowStock:
+          type: boolean
+      required:
+        - id
+        - name
+        - stockQty
+        - purchasePrice
+        - sellingPrice
+        - stockValue
+        - isLowStock
+
+    TopProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        totalSold:
+          type: number
+        totalRevenue:
+          type: number
+        totalProfit:
+          type: number
+      required:
+        - id
+        - name
+        - totalSold
+        - totalRevenue
+        - totalProfit

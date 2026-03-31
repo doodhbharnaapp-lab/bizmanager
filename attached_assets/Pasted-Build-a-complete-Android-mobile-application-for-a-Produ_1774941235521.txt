@@ -1,0 +1,167 @@
+Build a complete Android mobile application for a Product Purchase & Sales Management System with inventory, accounting, billing, and reporting features.
+
+The app should be designed for small to medium businesses (like retail shops, distributors, agriculture product sellers).
+
+### 🔹 Core Modules
+
+1. Supplier Management
+
+* Add/Edit/Delete suppliers
+* Track supplier payments
+* Outstanding dues (udhari)
+* Supplier-wise ledger
+
+2. Customer Management
+
+* Add/Edit/Delete customers (buyers)
+* Track credit (udhari) and payments
+* Customer-wise ledger
+
+3. Product Management
+
+* Add products with:
+
+  * Name
+  * Category
+  * Purchase price
+  * Selling price
+  * GST %
+  * Rack/Location
+* Stock quantity tracking
+
+4. Purchase Management
+
+* Create purchase entries from suppliers
+* Update stock automatically
+* Record purchase price, quantity, GST
+* Generate purchase invoice
+
+5. Sales Management
+
+* Create sales entries for customers
+* Payment modes:
+
+  * Cash
+  * UPI
+  * Credit (Udhari)
+* Auto stock deduction
+* Sales invoice generation (GST & Non-GST)
+
+6. Ledger System
+
+* Unified ledger system for:
+
+  * Suppliers
+  * Customers
+* Track:
+
+  * Purchases
+  * Sales
+  * Payments
+  * Balances
+* Date-wise transaction history
+
+7. Stock Management
+
+* Real-time stock updates
+* Low stock alerts
+* Stock adjustment
+* Item return handling:
+
+  * Return to supplier (purchase return)
+  * Customer returns (sales return)
+* Handle both:
+
+  * Item return
+  * Money refund
+
+8. Reports & Analytics
+
+* Item-wise reports
+* Supplier-wise reports
+* Customer-wise reports
+* Trend-wise (daily, monthly, yearly)
+* Profit & Loss:
+
+  * Item-wise
+  * Rack-wise
+  * Overall
+* Purchase vs Sales comparison
+* Export reports (PDF)
+
+9. Billing / Invoice
+
+* Generate invoices with:
+
+  * GST and without GST option
+  * Business details
+  * Customer details
+* Share invoice as PDF (WhatsApp supported)
+
+10. Dashboard
+
+* Summary cards:
+
+  * Total sales
+  * Total purchase
+  * Profit
+  * Pending payments
+* Graphs for trends
+
+---
+
+### 🔹 Technical Requirements
+* Backend: (Auth + Database)
+* Database Tables:
+  * users
+  * suppliers
+  * customers
+  * products
+  * purchases
+  * sales
+  * payments
+  * ledger_entries
+  * returns
+* State Management: React Context or Zustand
+* Styling: Tailwind (NativeWind) or custom UI
+* Offline support (basic caching)
+* Secure authentication (login/signup)
+
+---
+
+### 🔹 Advanced Features
+
+* UPI QR payment integration (display QR)
+* Multi-user role (Admin / Staff)
+* Data backup & restore
+* Search & filters everywhere
+* Dark mode UI
+
+---
+
+### 🔹 UI/UX Requirements
+
+* Clean modern UI (mobile-first)
+* Bottom navigation:
+
+  * Dashboard
+  * Products
+  * Sales
+  * Purchases
+  * Reports
+* Fast entry forms (optimized for shop use)
+* Minimal typing, more dropdowns
+
+---
+
+### 🔹 Output अपेक्षित (Expected Output)
+
+* Full working Expo project
+* All screens implemented
+* Supabase integration
+* Sample data
+* Ready-to-build Android APK
+
+---
+
+Generate complete code with folder structure, components, screens, and database schema.
