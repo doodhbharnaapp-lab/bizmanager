@@ -39,6 +39,8 @@ packages:
   - lib/*
   - lib/integrations/*
   - scripts
+    - '!artifacts/mockup-sandbox'   # ← Yeh line ADD kar
+
 
 catalog:
   '@replit/vite-plugin-cartographer': ^0.5.1
