@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 
 export const paymentsTable = pgTable("payments", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().default(0),
   partyType: varchar("party_type", { length: 50 }).notNull(),
   partyId: integer("party_id").notNull(),
   partyName: varchar("party_name", { length: 255 }).notNull(),

@@ -1,14 +1,16 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { salesTable, purchasesTable, productsTable } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
 router.get("/profit-loss", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { startDate, endDate, groupBy = "overall" } = req.query;
-    let sales = await db.select().from(salesTable);
-    let purchases = await db.select().from(purchasesTable);
+    let sales = await db.select().from(salesTable).where(eq(salesTable.userId, userId));
+    let purchases = await db.select().from(purchasesTable).where(eq(purchasesTable.userId, userId));
     if (startDate) { sales = sales.filter(s => s.date >= startDate as string); purchases = purchases.filter(p => p.date >= startDate as string); }
     if (endDate) { sales = sales.filter(s => s.date <= endDate as string); purchases = purchases.filter(p => p.date <= endDate as string); }
 
@@ -49,7 +51,10 @@ router.get("/profit-loss", async (req, res) => {
 
 router.get("/stock", async (req, res) => {
   try {
-    const products = await db.select().from(productsTable).orderBy(productsTable.name);
+    const userId = (req as any).userId;
+    const products = await db.select().from(productsTable)
+      .where(eq(productsTable.userId, userId))
+      .orderBy(productsTable.name);
     res.json(products.map(p => ({
       id: p.id, name: p.name, category: p.category, rack: p.rack,
       stockQty: parseFloat(p.stockQty || "0"),
@@ -67,9 +72,10 @@ router.get("/stock", async (req, res) => {
 
 router.get("/top-products", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const limit = parseInt(req.query.limit as string) || 10;
-    const sales = await db.select().from(salesTable);
-    const purchases = await db.select().from(purchasesTable);
+    const sales = await db.select().from(salesTable).where(eq(salesTable.userId, userId));
+    const purchases = await db.select().from(purchasesTable).where(eq(purchasesTable.userId, userId));
     const productMap: Record<number, { name: string; category: string; totalSold: number; totalRevenue: number; totalCost: number }> = {};
 
     for (const sale of sales) {

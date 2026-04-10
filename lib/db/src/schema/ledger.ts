@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 
 export const ledgerEntriesTable = pgTable("ledger_entries", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().default(0),
   partyType: varchar("party_type", { length: 50 }).notNull(),
   partyId: integer("party_id").notNull(),
   type: varchar("type", { length: 50 }).notNull(),

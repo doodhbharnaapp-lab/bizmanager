@@ -12,9 +12,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { FAB } from "@/components/FAB";
 import { Badge } from "@/components/Badge";
 import { AppHeader } from "@/components/AppHeader";
-
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
-
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 export default function ProductsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -23,7 +21,6 @@ export default function ProductsScreen() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
-
   const { data: products = [], isLoading, refetch } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -32,20 +29,16 @@ export default function ProductsScreen() {
     },
     enabled: !!token,
   });
-
   const allProducts = lowStock === "true"
     ? products.filter((p: any) => p.stockQty <= (p.lowStockThreshold || 10))
     : products;
-
   const categories = Array.from(new Set(products.map((p: any) => p.category).filter(Boolean))) as string[];
-
   const filtered = allProducts.filter((p: any) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       (p.category || "").toLowerCase().includes(search.toLowerCase());
     const matchCategory = !selectedCategory || p.category === selectedCategory;
     return matchSearch && matchCategory;
   });
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <AppHeader
@@ -57,7 +50,6 @@ export default function ProductsScreen() {
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
       >
         <SearchBar value={search} onChangeText={setSearch} placeholder="Search products..." />
-
         {categories.length > 0 && (
           <ScrollView
             horizontal
@@ -83,7 +75,6 @@ export default function ProductsScreen() {
             ))}
           </ScrollView>
         )}
-
         {filtered.length === 0 ? (
           <EmptyState
             icon="package"
@@ -98,7 +89,7 @@ export default function ProductsScreen() {
               key={p.id}
               title={p.name}
               subtitle={[p.category, p.rack].filter(Boolean).join(" · ")}
-              value={`₹${p.sellingPrice}`}
+              value={`${p.sellingPrice}`}
               valueSub={`Stock: ${p.stockQty} ${p.unit || "pcs"}`}
               valueColor={p.stockQty <= (p.lowStockThreshold || 10) ? colors.destructive : colors.foreground}
               onPress={() => router.push(`/products/${p.id}` as any)}
@@ -112,7 +103,6 @@ export default function ProductsScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16 },

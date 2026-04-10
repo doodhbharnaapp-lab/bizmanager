@@ -1,15 +1,17 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { productsTable } from "@workspace/db/schema";
-import { eq, ilike, lte, sql } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { search, category, lowStock } = req.query;
-    let products = await db.select().from(productsTable).orderBy(productsTable.name);
-
+    let products = await db.select().from(productsTable)
+      .where(eq(productsTable.userId, userId))
+      .orderBy(productsTable.name);
     if (search) {
       const q = (search as string).toLowerCase();
       products = products.filter(p => p.name.toLowerCase().includes(q) || (p.category || "").toLowerCase().includes(q));
@@ -29,8 +31,10 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
-    const products = await db.select().from(productsTable).where(eq(productsTable.id, id));
+    const products = await db.select().from(productsTable)
+      .where(and(eq(productsTable.id, id), eq(productsTable.userId, userId)));
     if (!products[0]) return res.status(404).json({ error: "Not found" });
     res.json(formatProduct(products[0]));
   } catch (err) {
@@ -41,9 +45,11 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { name, category, purchasePrice, sellingPrice, gstPercent = 0, rack, stockQty = 0, lowStockThreshold = 10, unit = "pcs" } = req.body;
     const result = await db.insert(productsTable).values({
-      name, category, purchasePrice: String(purchasePrice), sellingPrice: String(sellingPrice),
+      userId, name, category,
+      purchasePrice: String(purchasePrice), sellingPrice: String(sellingPrice),
       gstPercent: String(gstPercent), rack, stockQty: String(stockQty),
       lowStockThreshold: String(lowStockThreshold), unit,
     }).returning();
@@ -56,6 +62,7 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
     const { name, category, purchasePrice, sellingPrice, gstPercent, rack, stockQty, lowStockThreshold, unit } = req.body;
     const updates: any = {};
@@ -68,7 +75,9 @@ router.put("/:id", async (req, res) => {
     if (stockQty !== undefined) updates.stockQty = String(stockQty);
     if (lowStockThreshold !== undefined) updates.lowStockThreshold = String(lowStockThreshold);
     if (unit !== undefined) updates.unit = unit;
-    const result = await db.update(productsTable).set(updates).where(eq(productsTable.id, id)).returning();
+    const result = await db.update(productsTable).set(updates)
+      .where(and(eq(productsTable.id, id), eq(productsTable.userId, userId)))
+      .returning();
     if (!result[0]) return res.status(404).json({ error: "Not found" });
     res.json(formatProduct(result[0]));
   } catch (err) {
@@ -79,8 +88,10 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
-    await db.delete(productsTable).where(eq(productsTable.id, id));
+    await db.delete(productsTable)
+      .where(and(eq(productsTable.id, id), eq(productsTable.userId, userId)));
     res.json({ message: "Deleted" });
   } catch (err) {
     req.log.error(err);
@@ -90,13 +101,18 @@ router.delete("/:id", async (req, res) => {
 
 router.post("/:id/adjust", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
     const { adjustment } = req.body;
-    const products = await db.select().from(productsTable).where(eq(productsTable.id, id));
+    const products = await db.select().from(productsTable)
+      .where(and(eq(productsTable.id, id), eq(productsTable.userId, userId)));
     if (!products[0]) return res.status(404).json({ error: "Not found" });
     const current = parseFloat(products[0].stockQty);
     const newQty = current + parseFloat(adjustment);
-    const result = await db.update(productsTable).set({ stockQty: String(newQty) }).where(eq(productsTable.id, id)).returning();
+    const result = await db.update(productsTable)
+      .set({ stockQty: String(newQty) })
+      .where(and(eq(productsTable.id, id), eq(productsTable.userId, userId)))
+      .returning();
     res.json(formatProduct(result[0]));
   } catch (err) {
     req.log.error(err);

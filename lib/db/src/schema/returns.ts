@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 
 export const returnsTable = pgTable("returns", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().default(0),
   returnType: varchar("return_type", { length: 50 }).notNull(),
   referenceId: integer("reference_id").notNull(),
   productId: integer("product_id").notNull(),

@@ -6,6 +6,9 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// ----------------------
+// Middleware
+// ----------------------
 app.use(
   pinoHttp({
     logger,
@@ -23,12 +26,19 @@ app.use(
         };
       },
     },
-  }),
+  })
 );
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ----------------------
+// Routes
+// ----------------------
 app.use("/api", router);
 
+// ----------------------
+// Export app only (server will be started by index.ts)
+// ----------------------
 export default app;

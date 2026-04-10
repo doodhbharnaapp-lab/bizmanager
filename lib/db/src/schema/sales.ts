@@ -1,12 +1,12 @@
 import { pgTable, serial, varchar, numeric, timestamp, integer, text, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
-import { customersTable } from "./customers";
 
 export const salesTable = pgTable("sales", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().default(0),
   invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
-  customerId: integer("customer_id").references(() => customersTable.id),
+  customerId: integer("customer_id"),
   customerName: varchar("customer_name", { length: 255 }),
   items: jsonb("items").notNull(),
   subtotal: numeric("subtotal", { precision: 12, scale: 2 }).notNull(),

@@ -10,7 +10,7 @@ import { FormField } from "@/components/FormField";
 import { SelectField } from "@/components/SelectField";
 import { AppHeader } from "@/components/AppHeader";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 interface CartItem { productId: number; productName: string; quantity: number; purchasePrice: number; gstPercent: number; }
 
 export default function NewPurchaseScreen() {
@@ -80,7 +80,7 @@ export default function NewPurchaseScreen() {
           placeholder="Select product..." options={products.map((p: any) => ({ label: p.name, value: String(p.id) }))} />
         <View style={styles.row}>
           <View style={{ flex: 1, marginRight: 8 }}><FormField label="Qty" value={qty} onChangeText={setQty} keyboardType="numeric" placeholder="1" /></View>
-          <View style={{ flex: 2, marginRight: 8 }}><FormField label="Price (₹)" value={price} onChangeText={setPrice} keyboardType="numeric" placeholder="0.00" /></View>
+          <View style={{ flex: 2, marginRight: 8 }}><FormField label="Price ()" value={price} onChangeText={setPrice} keyboardType="numeric" placeholder="0.00" /></View>
           <View style={{ flex: 1 }}><FormField label="GST %" value={gst} onChangeText={setGst} keyboardType="numeric" placeholder="0" /></View>
         </View>
         <TouchableOpacity style={[styles.addBtn, { backgroundColor: colors.accent }]} onPress={addToCart} activeOpacity={0.8}>
@@ -94,18 +94,18 @@ export default function NewPurchaseScreen() {
               <View key={i} style={[styles.cartItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.cartItemName, { color: colors.foreground }]}>{item.productName}</Text>
-                  <Text style={[styles.cartItemSub, { color: colors.mutedForeground }]}>{item.quantity} x ₹{item.purchasePrice} + {item.gstPercent}% GST</Text>
+                  <Text style={[styles.cartItemSub, { color: colors.mutedForeground }]}>{item.quantity} x {item.purchasePrice} + {item.gstPercent}% GST</Text>
                 </View>
-                <Text style={[styles.cartItemTotal, { color: colors.foreground }]}>₹{(item.quantity * item.purchasePrice * (1 + item.gstPercent / 100)).toFixed(0)}</Text>
+                <Text style={[styles.cartItemTotal, { color: colors.foreground }]}>{(item.quantity * item.purchasePrice * (1 + item.gstPercent / 100)).toFixed(0)}</Text>
                 <TouchableOpacity onPress={() => setCart(cart.filter((_, idx) => idx !== i))} style={{ marginLeft: 12 }}>
                   <Feather name="trash-2" size={16} color={colors.destructive} />
                 </TouchableOpacity>
               </View>
             ))}
             <View style={[styles.totals, { borderTopColor: colors.border }]}>
-              <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>Subtotal</Text><Text style={{ color: colors.foreground }}>₹{subtotal.toFixed(2)}</Text></View>
-              <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>GST</Text><Text style={{ color: colors.foreground }}>₹{totalGst.toFixed(2)}</Text></View>
-              <View style={styles.totalRow}><Text style={[styles.grandLabel, { color: colors.foreground }]}>Grand Total</Text><Text style={[styles.grandVal, { color: colors.primary }]}>₹{grandTotal.toFixed(2)}</Text></View>
+              <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>Subtotal</Text><Text style={{ color: colors.foreground }}>{subtotal.toFixed(2)}</Text></View>
+              <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>GST</Text><Text style={{ color: colors.foreground }}>{totalGst.toFixed(2)}</Text></View>
+              <View style={styles.totalRow}><Text style={[styles.grandLabel, { color: colors.foreground }]}>Grand Total</Text><Text style={[styles.grandVal, { color: colors.primary }]}>{grandTotal.toFixed(2)}</Text></View>
             </View>
           </View>
         )}

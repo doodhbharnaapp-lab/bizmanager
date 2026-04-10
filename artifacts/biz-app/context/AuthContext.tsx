@@ -20,7 +20,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}`;
 
 async function apiPost(path: string, body: object, token?: string) {
   const res = await fetch(`${API_BASE}/api${path}`, {
@@ -43,7 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setBaseUrl(API_BASE);
-    setAuthTokenGetter(() => token);
+    // ✅ FIXED: Promise resolve karo
+    setAuthTokenGetter(() => Promise.resolve(token));
   }, [token]);
 
   useEffect(() => {

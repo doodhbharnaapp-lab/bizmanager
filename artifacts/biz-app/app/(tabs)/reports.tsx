@@ -9,21 +9,17 @@ import { useAuth } from "@/context/AuthContext";
 import { SummaryCard } from "@/components/SummaryCard";
 import { ListItem } from "@/components/ListItem";
 import { AppHeader } from "@/components/AppHeader";
-
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
-
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 function fmt(n: number) {
-  if (n >= 100000) return `₹${(n / 100000).toFixed(2)}L`;
-  if (n >= 1000) return `₹${(n / 1000).toFixed(1)}K`;
-  return `₹${n.toFixed(0)}`;
+  if (n >= 100000) return `${(n / 100000).toFixed(2)}L`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return `${n.toFixed(0)}`;
 }
-
 export default function ReportsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { token } = useAuth();
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
-
   const { data: pl, isLoading: plLoading, refetch: plRefetch } = useQuery({
     queryKey: ["profit-loss"],
     queryFn: async () => {
@@ -32,7 +28,6 @@ export default function ReportsScreen() {
     },
     enabled: !!token,
   });
-
   const { data: topProducts = [], refetch: topRefetch } = useQuery({
     queryKey: ["top-products"],
     queryFn: async () => {
@@ -41,7 +36,6 @@ export default function ReportsScreen() {
     },
     enabled: !!token,
   });
-
   const { data: stockReport = [], refetch: stockRefetch } = useQuery({
     queryKey: ["stock-report"],
     queryFn: async () => {
@@ -50,12 +44,9 @@ export default function ReportsScreen() {
     },
     enabled: !!token,
   });
-
   const lowStockItems = stockReport.filter((i: any) => i.isLowStock);
   const totalStockValue = stockReport.reduce((s: number, i: any) => s + i.stockValue, 0);
-
   const refetch = () => { plRefetch(); topRefetch(); stockRefetch(); };
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <AppHeader title="Reports" subtitle="Business analytics" />
@@ -72,7 +63,6 @@ export default function ReportsScreen() {
           sub={`Margin: ${(pl?.profitMargin || 0).toFixed(1)}%`}
           accent={pl?.grossProfit >= 0 ? colors.success : colors.destructive}
           icon={<Feather name="dollar-sign" size={20} color={pl?.grossProfit >= 0 ? colors.success : colors.destructive} />} />
-
         <TouchableOpacity
           style={[styles.viewMore, { backgroundColor: colors.primary + "12", borderColor: colors.primary + "30" }]}
           onPress={() => router.push("/reports/detail" as any)} activeOpacity={0.8}
@@ -80,13 +70,11 @@ export default function ReportsScreen() {
           <Text style={[styles.viewMoreText, { color: colors.primary }]}>View Detailed P&L Report</Text>
           <Feather name="chevron-right" size={16} color={colors.primary} />
         </TouchableOpacity>
-
         <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>STOCK VALUE</Text>
         <SummaryCard label="Total Stock Value" value={fmt(totalStockValue)}
           sub={`${lowStockItems.length} items low on stock`}
           accent={colors.accent}
           icon={<Feather name="package" size={20} color={colors.accent} />} />
-
         <TouchableOpacity
           style={[styles.viewMore, { backgroundColor: colors.primary + "12", borderColor: colors.primary + "30" }]}
           onPress={() => router.push("/reports/stock" as any)} activeOpacity={0.8}
@@ -94,7 +82,6 @@ export default function ReportsScreen() {
           <Text style={[styles.viewMoreText, { color: colors.primary }]}>View Full Stock Report</Text>
           <Feather name="chevron-right" size={16} color={colors.primary} />
         </TouchableOpacity>
-
         {topProducts.length > 0 && (
           <>
             <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>TOP PRODUCTS</Text>
@@ -111,7 +98,6 @@ export default function ReportsScreen() {
             ))}
           </>
         )}
-
         <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>MORE REPORTS</Text>
         {[
           { label: "Supplier Reports", icon: "truck", route: "/reports/suppliers" },
@@ -124,7 +110,6 @@ export default function ReportsScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 16 },

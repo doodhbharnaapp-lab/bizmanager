@@ -1,3 +1,4 @@
+import "@/lib/globalFetch";  // 🔴 LINE 1 - SABSE UPAR
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -19,7 +20,7 @@ import { setBaseUrl } from "@workspace/api-client-react";
 
 SplashScreen.preventAutoHideAsync();
 
-setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`);
+setBaseUrl(`http://${process.env.EXPO_PUBLIC_DOMAIN}`);
 
 const queryClient = new QueryClient();
 

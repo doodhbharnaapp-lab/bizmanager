@@ -1,30 +1,26 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { salesTable, purchasesTable, customersTable, suppliersTable, productsTable } from "@workspace/db/schema";
-import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
 router.get("/summary", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const today = new Date().toISOString().split("T")[0];
     const monthStart = today.substring(0, 7) + "-01";
 
-    const sales = await db.select().from(salesTable);
-    const purchases = await db.select().from(purchasesTable);
-    const customers = await db.select().from(customersTable);
-    const suppliers = await db.select().from(suppliersTable);
-    const products = await db.select().from(productsTable);
+    const sales = await db.select().from(salesTable).where(eq(salesTable.userId, userId));
+    const purchases = await db.select().from(purchasesTable).where(eq(purchasesTable.userId, userId));
+    const customers = await db.select().from(customersTable).where(eq(customersTable.userId, userId));
+    const suppliers = await db.select().from(suppliersTable).where(eq(suppliersTable.userId, userId));
+    const products = await db.select().from(productsTable).where(eq(productsTable.userId, userId));
 
     const todaySales = sales.filter(s => s.date === today).reduce((sum, s) => sum + parseFloat(s.grandTotal), 0);
     const todayPurchases = purchases.filter(p => p.date === today).reduce((sum, p) => sum + parseFloat(p.grandTotal), 0);
     const monthSales = sales.filter(s => s.date >= monthStart).reduce((sum, s) => sum + parseFloat(s.grandTotal), 0);
     const monthPurchases = purchases.filter(p => p.date >= monthStart).reduce((sum, p) => sum + parseFloat(p.grandTotal), 0);
-
-    const totalSalesCost = sales.reduce((sum, s) => {
-      const items = Array.isArray(s.items) ? s.items : JSON.parse(s.items as string || "[]");
-      return sum + items.reduce((is: number, i: any) => is + (i.quantity * i.sellingPrice * 0.7), 0);
-    }, 0);
     const grossProfit = monthSales - monthPurchases;
 
     const pendingFromCustomers = customers.reduce((s, c) => s + parseFloat(c.balance), 0);
@@ -52,9 +48,10 @@ router.get("/summary", async (req, res) => {
 
 router.get("/trends", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const period = (req.query.period as string) || "monthly";
-    const sales = await db.select().from(salesTable);
-    const purchases = await db.select().from(purchasesTable);
+    const sales = await db.select().from(salesTable).where(eq(salesTable.userId, userId));
+    const purchases = await db.select().from(purchasesTable).where(eq(purchasesTable.userId, userId));
     const trendsMap: Record<string, { sales: number; purchases: number }> = {};
 
     for (const s of sales) {

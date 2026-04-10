@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { requireAuth } from "../middleware/auth";
 import healthRouter from "./health";
 import authRouter from "./auth";
 import suppliersRouter from "./suppliers";
@@ -16,6 +17,9 @@ const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use("/auth", authRouter);
+
+router.use(requireAuth);
+
 router.use("/suppliers", suppliersRouter);
 router.use("/customers", customersRouter);
 router.use("/products", productsRouter);

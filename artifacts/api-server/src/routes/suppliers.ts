@@ -1,19 +1,21 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { suppliersTable, ledgerEntriesTable } from "@workspace/db/schema";
-import { eq, ilike, desc, and } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { search } = req.query;
-    let query = db.select().from(suppliersTable);
+    let suppliers = await db.select().from(suppliersTable)
+      .where(eq(suppliersTable.userId, userId))
+      .orderBy(suppliersTable.name);
     if (search) {
-      const results = await db.select().from(suppliersTable).where(ilike(suppliersTable.name, `%${search}%`));
-      return res.json(results.map(formatSupplier));
+      const q = (search as string).toLowerCase();
+      suppliers = suppliers.filter(s => s.name.toLowerCase().includes(q));
     }
-    const suppliers = await query.orderBy(suppliersTable.name);
     res.json(suppliers.map(formatSupplier));
   } catch (err) {
     req.log.error(err);
@@ -23,8 +25,10 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
-    const suppliers = await db.select().from(suppliersTable).where(eq(suppliersTable.id, id));
+    const suppliers = await db.select().from(suppliersTable)
+      .where(and(eq(suppliersTable.id, id), eq(suppliersTable.userId, userId)));
     if (!suppliers[0]) return res.status(404).json({ error: "Not found" });
     res.json(formatSupplier(suppliers[0]));
   } catch (err) {
@@ -35,8 +39,11 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { name, phone, email, address, gstNumber } = req.body;
-    const result = await db.insert(suppliersTable).values({ name, phone, email, address, gstNumber }).returning();
+    const result = await db.insert(suppliersTable)
+      .values({ userId, name, phone, email, address, gstNumber })
+      .returning();
     res.status(201).json(formatSupplier(result[0]));
   } catch (err) {
     req.log.error(err);
@@ -46,9 +53,13 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
     const { name, phone, email, address, gstNumber } = req.body;
-    const result = await db.update(suppliersTable).set({ name, phone, email, address, gstNumber }).where(eq(suppliersTable.id, id)).returning();
+    const result = await db.update(suppliersTable)
+      .set({ name, phone, email, address, gstNumber })
+      .where(and(eq(suppliersTable.id, id), eq(suppliersTable.userId, userId)))
+      .returning();
     if (!result[0]) return res.status(404).json({ error: "Not found" });
     res.json(formatSupplier(result[0]));
   } catch (err) {
@@ -59,8 +70,10 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
-    await db.delete(suppliersTable).where(eq(suppliersTable.id, id));
+    await db.delete(suppliersTable)
+      .where(and(eq(suppliersTable.id, id), eq(suppliersTable.userId, userId)));
     res.json({ message: "Deleted" });
   } catch (err) {
     req.log.error(err);
@@ -70,9 +83,14 @@ router.delete("/:id", async (req, res) => {
 
 router.get("/:id/ledger", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const partyId = parseInt(req.params.id);
     const entries = await db.select().from(ledgerEntriesTable)
-      .where(and(eq(ledgerEntriesTable.partyType, "supplier"), eq(ledgerEntriesTable.partyId, partyId)))
+      .where(and(
+        eq(ledgerEntriesTable.userId, userId),
+        eq(ledgerEntriesTable.partyType, "supplier"),
+        eq(ledgerEntriesTable.partyId, partyId)
+      ))
       .orderBy(ledgerEntriesTable.date, ledgerEntriesTable.createdAt);
     const formatted = entries.map(formatLedgerEntry);
     const totalDebit = formatted.reduce((s, e) => s + e.debit, 0);

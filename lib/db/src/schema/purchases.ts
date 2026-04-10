@@ -1,12 +1,12 @@
 import { pgTable, serial, varchar, numeric, timestamp, integer, text, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
-import { suppliersTable } from "./suppliers";
 
 export const purchasesTable = pgTable("purchases", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().default(0),
   invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
-  supplierId: integer("supplier_id").notNull().references(() => suppliersTable.id),
+  supplierId: integer("supplier_id").notNull(),
   supplierName: varchar("supplier_name", { length: 255 }).notNull(),
   items: jsonb("items").notNull(),
   subtotal: numeric("subtotal", { precision: 12, scale: 2 }).notNull(),

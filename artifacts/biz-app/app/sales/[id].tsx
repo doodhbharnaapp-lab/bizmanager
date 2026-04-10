@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/Badge";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function SaleDetailScreen() {
   const colors = useColors();
@@ -56,15 +56,15 @@ export default function SaleDetailScreen() {
             <View key={i} style={[styles.item, { borderBottomColor: colors.border, borderBottomWidth: i < sale.items.length - 1 ? 0.5 : 0 }]}>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.itemName, { color: colors.foreground }]}>{item.productName}</Text>
-                <Text style={[styles.itemSub, { color: colors.mutedForeground }]}>{item.quantity} x ₹{item.sellingPrice} {item.gstPercent > 0 ? `(GST ${item.gstPercent}%)` : ""}</Text>
+                <Text style={[styles.itemSub, { color: colors.mutedForeground }]}>{item.quantity} x {item.sellingPrice} {item.gstPercent > 0 ? `(GST ${item.gstPercent}%)` : ""}</Text>
               </View>
-              <Text style={[styles.itemTotal, { color: colors.foreground }]}>₹{item.totalAmount.toFixed(0)}</Text>
+              <Text style={[styles.itemTotal, { color: colors.foreground }]}>{item.totalAmount.toFixed(0)}</Text>
             </View>
           ))}
           <View style={[styles.totals, { borderTopColor: colors.border }]}>
-            <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>Subtotal</Text><Text style={{ color: colors.foreground }}>₹{sale.subtotal.toFixed(2)}</Text></View>
-            {sale.totalGst > 0 && <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>GST</Text><Text style={{ color: colors.foreground }}>₹{sale.totalGst.toFixed(2)}</Text></View>}
-            <View style={styles.totalRow}><Text style={[styles.grandLabel, { color: colors.foreground }]}>Grand Total</Text><Text style={[styles.grandVal, { color: colors.primary }]}>₹{sale.grandTotal.toFixed(2)}</Text></View>
+            <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>Subtotal</Text><Text style={{ color: colors.foreground }}>{sale.subtotal.toFixed(2)}</Text></View>
+            {sale.totalGst > 0 && <View style={styles.totalRow}><Text style={[styles.totalLabel, { color: colors.mutedForeground }]}>GST</Text><Text style={{ color: colors.foreground }}>{sale.totalGst.toFixed(2)}</Text></View>}
+            <View style={styles.totalRow}><Text style={[styles.grandLabel, { color: colors.foreground }]}>Grand Total</Text><Text style={[styles.grandVal, { color: colors.primary }]}>{sale.grandTotal.toFixed(2)}</Text></View>
           </View>
         </View>
 

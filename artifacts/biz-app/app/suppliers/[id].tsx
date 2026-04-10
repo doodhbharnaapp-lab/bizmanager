@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { ListItem } from "@/components/ListItem";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function SupplierDetailScreen() {
   const colors = useColors();
@@ -34,7 +34,7 @@ export default function SupplierDetailScreen() {
           {supplier.gstNumber ? <View style={styles.infoRow}><Feather name="credit-card" size={16} color={colors.mutedForeground} /><Text style={[styles.infoText, { color: colors.foreground }]}>GST: {supplier.gstNumber}</Text></View> : null}
           <View style={[styles.balanceRow, { borderTopColor: colors.border }]}>
             <Text style={[styles.balLabel, { color: colors.mutedForeground }]}>Outstanding Balance</Text>
-            <Text style={[styles.balance, { color: supplier.balance > 0 ? colors.destructive : colors.success }]}>₹{supplier.balance.toFixed(2)}</Text>
+            <Text style={[styles.balance, { color: supplier.balance > 0 ? colors.destructive : colors.success }]}>{supplier.balance.toFixed(2)}</Text>
           </View>
         </View>
 
@@ -56,9 +56,9 @@ export default function SupplierDetailScreen() {
             <Text style={[styles.secTitle, { color: colors.mutedForeground }]}>LEDGER</Text>
             {ledger.entries.map((e: any) => (
               <ListItem key={e.id} title={e.description} subtitle={e.date}
-                value={e.credit > 0 ? `₹${e.credit.toFixed(0)}` : `-₹${e.debit.toFixed(0)}`}
+                value={e.credit > 0 ? `${e.credit.toFixed(0)}` : `-${e.debit.toFixed(0)}`}
                 valueColor={e.credit > 0 ? colors.destructive : colors.success}
-                valueSub={`Balance: ₹${e.balance.toFixed(0)}`} leftIcon="list" />
+                valueSub={`Balance: ${e.balance.toFixed(0)}`} leftIcon="list" />
             ))}
           </>
         )}

@@ -9,12 +9,12 @@ import { useAuth } from "@/context/AuthContext";
 import { SummaryCard } from "@/components/SummaryCard";
 import { ListItem } from "@/components/ListItem";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 function fmt(n: number) {
-  if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
-  if (n >= 1000) return `₹${(n / 1000).toFixed(1)}K`;
-  return `₹${n.toFixed(0)}`;
+  if (n >= 100000) return `${(n / 100000).toFixed(1)}L`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return `${n.toFixed(0)}`;
 }
 
 export default function DashboardScreen() {
@@ -141,7 +141,7 @@ export default function DashboardScreen() {
             <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>RECENT SALES</Text>
             {recentSales.map((s: any) => (
               <ListItem key={s.id} title={s.customerName || "Walk-in"} subtitle={s.date}
-                value={`₹${s.grandTotal.toFixed(0)}`} valueSub={s.paymentMode}
+                value={`${s.grandTotal.toFixed(0)}`} valueSub={s.paymentMode}
                 valueColor={s.paymentMode === "credit" ? colors.destructive : colors.success}
                 onPress={() => router.push(`/sales/${s.id}` as any)} />
             ))}

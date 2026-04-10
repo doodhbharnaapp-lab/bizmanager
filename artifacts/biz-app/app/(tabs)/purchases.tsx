@@ -12,7 +12,7 @@ import { FAB } from "@/components/FAB";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/Badge";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function PurchasesScreen() {
   const colors = useColors();
@@ -51,8 +51,8 @@ export default function PurchasesScreen() {
               key={p.id}
               title={p.supplierName}
               subtitle={`${p.invoiceNumber} · ${p.date}`}
-              value={`₹${p.grandTotal.toFixed(0)}`}
-              valueSub={`GST: ₹${p.totalGst.toFixed(0)}`}
+              value={`${p.grandTotal.toFixed(0)}`}
+              valueSub={`GST: ${p.totalGst.toFixed(0)}`}
               onPress={() => router.push(`/purchases/${p.id}` as any)}
               leftIcon="shopping-cart"
               rightElement={<Badge label={p.paymentMode.toUpperCase()} variant={p.paymentMode === "credit" ? "danger" : "success"} />}

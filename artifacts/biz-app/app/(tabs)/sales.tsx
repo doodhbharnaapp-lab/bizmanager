@@ -12,7 +12,7 @@ import { FAB } from "@/components/FAB";
 import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/Badge";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function SalesScreen() {
   const colors = useColors();
@@ -41,7 +41,7 @@ export default function SalesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <AppHeader title="Sales" subtitle={`${sales.length} bills · ₹${total.toFixed(0)} total`} />
+      <AppHeader title="Sales" subtitle={`${sales.length} bills · ${total.toFixed(0)} total`} />
       <ScrollView
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 80 }]}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
@@ -55,7 +55,7 @@ export default function SalesScreen() {
               key={s.id}
               title={s.customerName || "Walk-in Customer"}
               subtitle={`${s.invoiceNumber} · ${s.date}`}
-              value={`₹${s.grandTotal.toFixed(0)}`}
+              value={`${s.grandTotal.toFixed(0)}`}
               valueSub={s.isGstInvoice ? "GST" : ""}
               valueColor={s.paymentMode === "credit" ? colors.destructive : colors.success}
               onPress={() => router.push(`/sales/${s.id}` as any)}

@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { purchasesTable, suppliersTable, productsTable, ledgerEntriesTable } from "@workspace/db/schema";
-import { eq, sql, and, gte, lte } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 
 const router = Router();
 
 let invoiceCounter = 1000;
-
 function getNextInvoice(prefix: string) {
   invoiceCounter++;
   return `${prefix}-${Date.now()}-${invoiceCounter}`;
@@ -14,7 +13,10 @@ function getNextInvoice(prefix: string) {
 
 router.get("/", async (req, res) => {
   try {
-    let purchases = await db.select().from(purchasesTable).orderBy(sql`${purchasesTable.date} desc`);
+    const userId = (req as any).userId;
+    let purchases = await db.select().from(purchasesTable)
+      .where(eq(purchasesTable.userId, userId))
+      .orderBy(sql`${purchasesTable.date} desc`);
     const { supplierId, startDate, endDate } = req.query;
     if (supplierId) purchases = purchases.filter(p => p.supplierId === parseInt(supplierId as string));
     if (startDate) purchases = purchases.filter(p => p.date >= startDate as string);
@@ -28,8 +30,10 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const id = parseInt(req.params.id);
-    const purchases = await db.select().from(purchasesTable).where(eq(purchasesTable.id, id));
+    const purchases = await db.select().from(purchasesTable)
+      .where(and(eq(purchasesTable.id, id), eq(purchasesTable.userId, userId)));
     if (!purchases[0]) return res.status(404).json({ error: "Not found" });
     res.json(formatPurchase(purchases[0]));
   } catch (err) {
@@ -40,10 +44,12 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { supplierId, items, paymentMode, notes, date } = req.body;
     const purchaseDate = date || new Date().toISOString().split("T")[0];
 
-    const supplier = await db.select().from(suppliersTable).where(eq(suppliersTable.id, supplierId));
+    const supplier = await db.select().from(suppliersTable)
+      .where(and(eq(suppliersTable.id, supplierId), eq(suppliersTable.userId, userId)));
     if (!supplier[0]) return res.status(400).json({ error: "Supplier not found" });
 
     let subtotal = 0;
@@ -51,7 +57,8 @@ router.post("/", async (req, res) => {
     const processedItems: any[] = [];
 
     for (const item of items) {
-      const product = await db.select().from(productsTable).where(eq(productsTable.id, item.productId));
+      const product = await db.select().from(productsTable)
+        .where(and(eq(productsTable.id, item.productId), eq(productsTable.userId, userId)));
       if (!product[0]) continue;
       const gstAmt = (item.purchasePrice * item.quantity * item.gstPercent) / 100;
       const itemTotal = item.purchasePrice * item.quantity + gstAmt;
@@ -66,16 +73,17 @@ router.post("/", async (req, res) => {
         gstAmount: gstAmt,
         totalAmount: itemTotal,
       });
-
       const newQty = parseFloat(product[0].stockQty) + item.quantity;
-      await db.update(productsTable).set({ stockQty: String(newQty), purchasePrice: String(item.purchasePrice) }).where(eq(productsTable.id, item.productId));
+      await db.update(productsTable)
+        .set({ stockQty: String(newQty), purchasePrice: String(item.purchasePrice) })
+        .where(and(eq(productsTable.id, item.productId), eq(productsTable.userId, userId)));
     }
 
     const grandTotal = subtotal + totalGst;
     const invoiceNumber = getNextInvoice("PUR");
 
     const purchase = await db.insert(purchasesTable).values({
-      invoiceNumber, supplierId, supplierName: supplier[0].name, items: processedItems,
+      userId, invoiceNumber, supplierId, supplierName: supplier[0].name, items: processedItems,
       subtotal: String(subtotal), totalGst: String(totalGst), grandTotal: String(grandTotal),
       paymentMode, notes, date: purchaseDate,
     }).returning();
@@ -83,9 +91,10 @@ router.post("/", async (req, res) => {
     if (paymentMode === "credit") {
       const currentBalance = parseFloat(supplier[0].balance);
       const newBalance = currentBalance + grandTotal;
-      await db.update(suppliersTable).set({ balance: String(newBalance) }).where(eq(suppliersTable.id, supplierId));
+      await db.update(suppliersTable).set({ balance: String(newBalance) })
+        .where(and(eq(suppliersTable.id, supplierId), eq(suppliersTable.userId, userId)));
       await db.insert(ledgerEntriesTable).values({
-        partyType: "supplier", partyId: supplierId,
+        userId, partyType: "supplier", partyId: supplierId,
         type: "purchase", description: `Purchase - Invoice ${invoiceNumber}`,
         debit: "0", credit: String(grandTotal), balance: String(newBalance),
         referenceId: purchase[0].id, referenceType: "purchase", date: purchaseDate,

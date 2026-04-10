@@ -1,13 +1,16 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { returnsTable, productsTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
   try {
-    const returns = await db.select().from(returnsTable).orderBy(returnsTable.createdAt);
+    const userId = (req as any).userId;
+    const returns = await db.select().from(returnsTable)
+      .where(eq(returnsTable.userId, userId))
+      .orderBy(returnsTable.createdAt);
     res.json(returns.map(formatReturn));
   } catch (err) {
     req.log.error(err);
@@ -17,10 +20,12 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { returnType, referenceId, productId, quantity, amount, refundMode = "none", reason, date } = req.body;
     const returnDate = date || new Date().toISOString().split("T")[0];
 
-    const product = await db.select().from(productsTable).where(eq(productsTable.id, productId));
+    const product = await db.select().from(productsTable)
+      .where(and(eq(productsTable.id, productId), eq(productsTable.userId, userId)));
     if (!product[0]) return res.status(400).json({ error: "Product not found" });
 
     const currentQty = parseFloat(product[0].stockQty);
@@ -30,10 +35,12 @@ router.post("/", async (req, res) => {
     } else if (returnType === "sale_return") {
       newQty = currentQty + quantity;
     }
-    await db.update(productsTable).set({ stockQty: String(Math.max(0, newQty)) }).where(eq(productsTable.id, productId));
+    await db.update(productsTable)
+      .set({ stockQty: String(Math.max(0, newQty)) })
+      .where(and(eq(productsTable.id, productId), eq(productsTable.userId, userId)));
 
     const ret = await db.insert(returnsTable).values({
-      returnType, referenceId, productId, productName: product[0].name,
+      userId, returnType, referenceId, productId, productName: product[0].name,
       quantity: String(quantity), amount: String(amount), refundMode, reason, date: returnDate,
     }).returning();
     res.status(201).json(formatReturn(ret[0]));

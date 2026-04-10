@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { FormField } from "@/components/FormField";
 import { AppHeader } from "@/components/AppHeader";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function NewSupplierScreen() {
   const colors = useColors();

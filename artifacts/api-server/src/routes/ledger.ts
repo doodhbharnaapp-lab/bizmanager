@@ -7,8 +7,11 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   try {
+    const userId = (req as any).userId;
     const { partyType, partyId, startDate, endDate } = req.query;
-    let entries = await db.select().from(ledgerEntriesTable).orderBy(ledgerEntriesTable.date, ledgerEntriesTable.createdAt);
+    let entries = await db.select().from(ledgerEntriesTable)
+      .where(eq(ledgerEntriesTable.userId, userId))
+      .orderBy(ledgerEntriesTable.date, ledgerEntriesTable.createdAt);
     if (partyType) entries = entries.filter(e => e.partyType === partyType);
     if (partyId) entries = entries.filter(e => e.partyId === parseInt(partyId as string));
     if (startDate) entries = entries.filter(e => e.date >= startDate as string);

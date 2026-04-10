@@ -10,7 +10,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Badge } from "@/components/Badge";
 import { FormField } from "@/components/FormField";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function ProductDetailScreen() {
   const colors = useColors();
@@ -78,11 +78,11 @@ export default function ProductDetailScreen() {
           <View style={styles.row}>
             <View style={styles.infoCol}>
               <Text style={[styles.label, { color: colors.mutedForeground }]}>Purchase Price</Text>
-              <Text style={[styles.value, { color: colors.foreground }]}>₹{product.purchasePrice}</Text>
+              <Text style={[styles.value, { color: colors.foreground }]}>{product.purchasePrice}</Text>
             </View>
             <View style={styles.infoCol}>
               <Text style={[styles.label, { color: colors.mutedForeground }]}>Selling Price</Text>
-              <Text style={[styles.value, { color: colors.primary }]}>₹{product.sellingPrice}</Text>
+              <Text style={[styles.value, { color: colors.primary }]}>{product.sellingPrice}</Text>
             </View>
             <View style={styles.infoCol}>
               <Text style={[styles.label, { color: colors.mutedForeground }]}>GST</Text>

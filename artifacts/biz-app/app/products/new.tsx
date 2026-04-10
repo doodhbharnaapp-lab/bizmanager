@@ -10,7 +10,7 @@ import { FormField } from "@/components/FormField";
 import { SelectField } from "@/components/SelectField";
 import { AppHeader } from "@/components/AppHeader";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function NewProductScreen() {
   const colors = useColors();
@@ -50,8 +50,8 @@ export default function NewProductScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <AppHeader title="New Product" showBack />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad + 20 }]} keyboardShouldPersistTaps="handled">
-        <FormField label="Product Name *" value={name} onChangeText={setName} placeholder="e.g. Rice 25kg" autoCapitalize="words" />
-        <FormField label="Category" value={category} onChangeText={setCategory} placeholder="e.g. Grains, Electronics" autoCapitalize="words" />
+        <FormField label="Product Name *" value={name} onChangeText={setName} placeholder="e.g. Bhusa" autoCapitalize="words" />
+        <FormField label="Category" value={category} onChangeText={setCategory} placeholder="e.g. Cattlefeed" autoCapitalize="words" />
         <View style={styles.row}>
           <View style={{ flex: 1, marginRight: 8 }}><FormField label="Purchase Price *" value={purchasePrice} onChangeText={setPurchasePrice} keyboardType="numeric" placeholder="0.00" /></View>
           <View style={{ flex: 1 }}><FormField label="Selling Price *" value={sellingPrice} onChangeText={setSellingPrice} keyboardType="numeric" placeholder="0.00" /></View>

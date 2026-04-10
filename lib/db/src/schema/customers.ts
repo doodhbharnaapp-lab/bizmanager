@@ -1,9 +1,10 @@
-import { pgTable, serial, varchar, numeric, timestamp, text } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, numeric, timestamp, text, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 export const customersTable = pgTable("customers", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().default(0),
   name: varchar("name", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
   email: varchar("email", { length: 255 }),

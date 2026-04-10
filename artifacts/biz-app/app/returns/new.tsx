@@ -10,7 +10,7 @@ import { FormField } from "@/components/FormField";
 import { SelectField } from "@/components/SelectField";
 import { AppHeader } from "@/components/AppHeader";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 export default function NewReturnScreen() {
   const colors = useColors();
@@ -86,7 +86,7 @@ export default function NewReturnScreen() {
         <SelectField label="Product *" value={productId} onSelect={setProductId} placeholder="Select product..."
           options={products.map((p: any) => ({ label: `${p.name} (Stock: ${p.stockQty})`, value: String(p.id) }))} />
         <FormField label="Quantity *" value={quantity} onChangeText={setQuantity} keyboardType="numeric" placeholder="1" />
-        <FormField label="Refund Amount (₹)" value={refundAmount} onChangeText={setRefundAmount} keyboardType="numeric" placeholder="0.00" />
+        <FormField label="Refund Amount ()" value={refundAmount} onChangeText={setRefundAmount} keyboardType="numeric" placeholder="0.00" />
         <FormField label="Reason" value={reason} onChangeText={setReason} placeholder="Why is this being returned?" multiline numberOfLines={3} style={{ height: 80, textAlignVertical: "top" }} />
         <TouchableOpacity
           style={[styles.submitBtn, { backgroundColor: loading ? colors.primary + "80" : colors.primary }]}

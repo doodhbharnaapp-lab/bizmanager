@@ -11,12 +11,12 @@ import { SummaryCard } from "@/components/SummaryCard";
 import { EmptyState } from "@/components/EmptyState";
 import { Feather } from "@expo/vector-icons";
 
-const API_BASE = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
+const API_BASE = `http://${process.env.EXPO_PUBLIC_DOMAIN}/api`;
 
 function fmt(n: number) {
-  if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
-  if (n >= 1000) return `₹${(n / 1000).toFixed(1)}K`;
-  return `₹${n.toFixed(0)}`;
+  if (n >= 100000) return `${(n / 100000).toFixed(1)}L`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return `${n.toFixed(0)}`;
 }
 
 export default function SupplierReportScreen() {
@@ -80,7 +80,7 @@ export default function SupplierReportScreen() {
               title={s.name}
               subtitle={`${s.purchaseCount} purchases · ${s.phone || "No phone"}`}
               value={fmt(s.totalBought)}
-              valueSub={s.balance > 0 ? `Due: ₹${s.balance.toFixed(0)}` : "Settled"}
+              valueSub={s.balance > 0 ? `Due: ${s.balance.toFixed(0)}` : "Settled"}
               valueColor={s.balance > 0 ? colors.destructive : colors.success}
               onPress={() => router.push(`/suppliers/${s.id}` as any)}
               leftIcon="truck"
